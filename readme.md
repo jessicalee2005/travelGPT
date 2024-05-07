@@ -1,4 +1,4 @@
-# MoveGPT - Sample Code for API Calling AI Agent
+# MovieGPT - Sample Code for API Calling AI Agent
  *From CreataAI.com*
 
 ## Overview
