@@ -54,4 +54,19 @@ Can ask questions about movies or TV shows, and the chatbot will retrieve and pr
    ```
 2. Access the chatbot in your web browser at `http://localhost:8501`.
 
-## Usage
+## Possible Issues
+Here is the list of possible issues:
+1. *ValidationError: 1 validation error for StructuredTool
+   args_schema
+   subclass of BaseModel expected (type=type_error.subclass; expected_class=BaseModel)*: 
+
+   In utils/tools.py, try to replace: 
+   ```
+   from pydantic import BaseModel, Field"
+   ``` 
+   with
+
+   ```
+   from pydantic.v1 import BaseModel, Feild
+   ```
+   See more info here: https://github.com/langchain-ai/langchain/issues/9441
