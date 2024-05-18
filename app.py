@@ -1,15 +1,16 @@
 from chains.information_extractor import Information_Extractor
+from chains.summarizer import Summarizer  # Updated import for Summarizer
 import streamlit as st
 import os
 from dotenv import load_dotenv, find_dotenv
 from chains.tagger import Tagger
-from chains.summarizer import Summarizer
 from utils.logger import logger
 
 _ = load_dotenv(find_dotenv())  # read local .env file
 
-st.title("Move GPT - AI Agent that uses imdb API to answer questions about movies and TVs")
+st.title("Travel Destination Assistant - AI Agent")
 logger.propagate = False
+
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -21,12 +22,10 @@ for message in st.session_state.messages:
 
 # React to user input
 if prompt := st.chat_input(
-    "I am a helpful Imdb bot. Ask me anything about movies or TV Shows!"
+    "Ask me anything about travel destinations!"
 ):
     try:
-        tagger = Tagger(os.getenv("OPENAI_API_KEY"))
-        information_extractor = Information_Extractor(os.getenv("OPENAI_API_KEY"))
-        summarizer = Summarizer(os.getenv("OPENAI_API_KEY"))
+        summarizer = Summarizer(os.getenv("OPENAI_API_KEY"))  # Initialize Summarizer
         # Display user message in chat message container
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -34,19 +33,19 @@ if prompt := st.chat_input(
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("assistant"):
             st.markdown("Let me check that for you...")
-        user_intent = tagger.extract_information(prompt)
-        with st.chat_message("assistant"):
-            st.markdown(
-                f"Got it! You want to know about the {user_intent.name} and want to talk about the {user_intent.intent}."
-            )
-        information = information_extractor.get_information(user_intent)
+        
+        # Perform tagging, information extraction, and summarization
+        # Replace these steps with your specific implementation using Langchain or similar libraries
+        user_intent = Tagger(os.getenv("OPENAI_API_KEY")).extract_information(prompt)
+        information = Information_Extractor(os.getenv("OPENAI_API_KEY")).get_information(user_intent)
         summary = summarizer.summarize(information, prompt)
+        
         # Display assistant response in chat message container
         with st.chat_message("assistant"):
             st.markdown(summary)
         st.session_state.messages.append({"role": "assistant", "content": summary})
     except Exception as e:
         logger.debug(f"Error: {e}")
-        message = f"I was not able to process the request. I am an imdb bot and I can only answer questions about movies and TV shows."
+        message = "I was not able to process the request. Please try again."
         st.markdown(message)
         st.session_state.messages.append({"role": "assistant", "content": message})

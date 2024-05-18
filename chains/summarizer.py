@@ -3,10 +3,9 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.memory import ConversationBufferWindowMemory
 
-
 class Summarizer:
     """
-    A class used to answer user's questions based on the provided context.
+    A class used to summarize context and answer questions using OpenAI's GPT-3.5 model.
 
     Attributes
     ----------
@@ -27,26 +26,20 @@ class Summarizer:
         Summarizes the context and answers the question.
     """
 
-    def __init__(self, api_key) -> None:
+    def __init__(self, api_key: str) -> None:
         """
         Constructs all the necessary attributes for the Summarizer object.
 
         Parameters
         ----------
-            api_key : str
-                The API key to access the OpenAI model.
+        api_key : str
+            The API key to access the OpenAI model.
         """
         self.api_key = api_key
-        self.prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    """You are a helpful ai that can answer user's question based on the context provided. 
-                    """,
-                ),
-                ("user", "{input}"),
-            ]
-        )
+        self.prompt = ChatPromptTemplate.from_messages([
+            ("system", "You are a helpful AI that can answer user's questions based on the provided context."),
+            ("user", "{input}"),
+        ])
         self.model = ChatOpenAI(
             api_key=self.api_key,
             temperature=0.0,
@@ -62,17 +55,20 @@ class Summarizer:
 
         Parameters
         ----------
-            context : str
-                The context to summarize.
-            question : str
-                The question to answer.
+        context : str
+            The context to summarize.
+        question : str
+            The question to answer.
 
         Returns
         -------
-            str
-                The summary of the context and the answer to the question.
+        str
+            The summary of the context and the answer to the question.
         """
-        response: str = self.chain.invoke(
-            {"input": f""" Context : {context} Question : {question}"""}
-        )
-        return response
+        try:
+            response = self.chain.invoke({
+                "input": f"Context: {context} Question: {question}"
+            })
+            return response
+        except Exception as e:
+            return f"Error: {str(e)}"
