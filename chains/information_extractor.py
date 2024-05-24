@@ -2,7 +2,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.utils.openai_functions import convert_pydantic_to_openai_function
 from langchain.output_parsers.openai_functions import PydanticOutputFunctionsParser
-from utils.tools import get_id, get_info, get_plot, get_cast_details, get_awards, get_images
+from utils.tools import get_destination_info, get_travel_guide, get_local_events, get_restaurant_recommendations, get_accommodation_options, get_images
 from schema.schema import UserIntent
 from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain.schema.agent import AgentFinish
@@ -53,7 +53,7 @@ class Information_Extractor:
         ])
         self.functions = [
             format_tool_to_openai_function(f)
-            for f in [get_info, get_plot, get_cast_details, get_awards, get_images]
+            for f in [get_destination_info, get_travel_guide, get_local_events, get_restaurant_recommendations, get_accommodation_options, get_images]
         ]
         self.model = ChatOpenAI(
             api_key=self.api_key, temperature=0.0, model="gpt-3.5-turbo-0125"
@@ -80,10 +80,11 @@ class Information_Extractor:
             return result.return_values["output"]
         else:
             tools = {
-                "get_info": get_info,
-                "get_plot": get_plot,
-                "get_cast_details": get_cast_details,
-                "get_awards": get_awards,
+                "get_destination_info": get_destination_info,
+                "get_travel_guide": get_travel_guide,
+                "get_local_events": get_local_events,
+                "get_restaurant_recommendations": get_restaurant_recommendations,
+                "get_accommodation_options": get_accommodation_options,
                 "get_images": get_images
             }
             return tools[result.tool].run(result.tool_input)
@@ -103,7 +104,7 @@ class Information_Extractor:
             The information about the travel destination.
         """
         # Assuming user_intent provides details like destination name or ID
-        destination_info: str = get_info(user_intent.name)
-        input_query = f"I want to know about the destination with id {destination_info['id']} or name {destination_info['name']} and want to talk about the {user_intent.intent}."
+        destination_info: str = get_destination_info(user_intent.name)
+        input_query = f"I want to know about the travel destination with id {destination_info['id']} or name {destination_info['name']} and want to talk about the {user_intent.intent}."
         information: str = self.chain.invoke({"input": input_query})
         return information
